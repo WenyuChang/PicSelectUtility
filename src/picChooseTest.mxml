@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:frameCanvas="*"
+	initialize="init()" paddingLeft="0" paddingTop="0" 
+	horizontalAlign="left">
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.*;
+			public function init():void
+			{
+				ccc.getPic(this, 2);
+			}
+		]]>
+	</mx:Script>
+	<mx:HBox width="100%" height="100%">
+		<mx:Canvas id="centerPart" width="100%" height="100%">
+        	<mx:Image id="pic" x="0" y="0" width="500" height="353" source="@Embed('/Images/PicImg_NFL_NOV_06_dab9.jpg')"/>
+        	<frameCanvas:picChoose id="ccc" x="0" y="0" width="500" height="353" />
+    	</mx:Canvas>
+	</mx:HBox>
+</mx:Application>

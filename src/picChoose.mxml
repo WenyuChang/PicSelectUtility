@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="400" height="300" initialize="init()">
+	<mx:Script>
+		<![CDATA[
+        	import mx.containers.Canvas;
+   			import flash.display.Sprite;
+   			import flash.events.MouseEvent;
+            import mx.controls.*;
+            import mx.core.*;
+   			
+   			public const RECTANGLE:int = 1;
+   			public const CIRCLE:int = 2;
+   			
+   			public var backCanvas:Application;
+   			public var shape:int;
+   			public var comp: UIComponent = new UIComponent();
+          	public var centerFrame:Sprite = new Sprite();
+          	public var border:Sprite = new Sprite();
+          	public var upwardFrame:Sprite = new Sprite();
+          	public var leftFrame:Sprite = new Sprite();
+          	public var rightFrame:Sprite = new Sprite();
+          	public var downFrame:Sprite = new Sprite();
+          	
+          	public var pos:Point = new Point();
+          	public var poslh:Point = new Point();
+          	public var poslb:Point = new Point();
+          	public var posrh:Point = new Point();
+          	public var posrb:Point = new Point();
+          	public var posh:Point = new Point();
+          	public var posrm:Point = new Point();
+          	public var posb:Point = new Point();
+          	public var poslm:Point = new Point();
+          	
+          	
+          	public var closelh:Boolean = false;
+          	public var closelb:Boolean = false;
+          	public var closerh:Boolean = false;
+          	public var closerb:Boolean = false;
+          	public var closeh:Boolean = false;
+          	public var closerm:Boolean = false;
+          	public var closeb:Boolean = false;
+          	public var closelm:Boolean = false;
+          	public var begin:Boolean = false;
+          	public var exist:Boolean = false;
+          	public var drag:Boolean = false;
+          	public var resize:Boolean =false;
+          	
+          	[Bindable]
+          	public var w:int = 0;
+          	
+          	[Bindable]
+          	public var h:int = 0;
+          	
+          	[Bindable]
+          	public var startx:int = 0;
+          	
+          	[Bindable]
+          	public var starty:int = 0;
+          	public var prew:int = 0;
+          	public var preh:int = 0;
+          	public var prestartx:int = 0;
+          	public var prestarty:int = 0;
+          	public var xx:int = 0;
+          	public var yy:int = 0;
+          	
+          	public function getPic(_backback:Application, _shape:int):void
+          	{
+          		backCanvas = _backback;
+          		shape = _shape;
+          		//this.addEventListener(MouseEvent.MOUSE_OUT,out);
+          	}
+          	
+          	public function init():void
+          	{
+           		this.addEventListener(MouseEvent.MOUSE_DOWN, pickup);
+           		
+           		comp.addChild(centerFrame);
+           		comp.addChild(border);
+           		comp.addChild(upwardFrame);
+           		comp.addChild(leftFrame);
+           		comp.addChild(rightFrame);
+           		comp.addChild(downFrame);
+           		
+           		this.addChild(comp);
+           		
+           		begin = true;
+           		resize = true;
+           		
+          	}
+          	
+			public function draw():void
+          	{
+          		
+          		var closelh:Boolean = startx + w > this.width || starty + h > this.height 
+          			|| startx<0 || starty<0;
+          			
+          		var closelb:Boolean = (w <= 0 || h <=0);
+          		
+          		if(closelh || closelb)
+          		{
+          			startx = prestartx;
+          			starty = prestarty;
+          			w = prew;
+          			h = preh;
+          		}
+          		centerFrame.graphics.clear();
+          		centerFrame.graphics.beginFill(0xccc);
+				centerFrame.graphics.lineStyle(2,0xffffff,1);
+           		centerFrame.graphics.drawRect(startx,starty,w,h);
+           		centerFrame.graphics.beginFill(0xccc);
+           		centerFrame.graphics.endFill();
+           		centerFrame.graphics.endFill();
+           		centerFrame.alpha = 0;
+           		
+           		if(shape == RECTANGLE)
+           		{
+	           		border.graphics.clear();
+	           		border.graphics.lineStyle(2,0xffffff,1);
+	           		border.graphics.drawRect(startx,starty,w,h);
+	           		border.graphics.drawCircle(startx, starty, 3);
+	           		border.graphics.drawCircle(startx, starty+h, 3);
+	           		border.graphics.drawCircle(startx+w, starty, 3);
+	           		border.graphics.drawCircle(startx+w, starty+h, 3);
+	           		border.alpha = 1;
+	           		
+	           		poslh = new Point(startx, starty);
+		          	poslb = new Point(startx, starty+h);
+		          	posrh = new Point(startx+w, starty);
+		          	posrb = new Point(startx+w, starty+h);
+           		}
+           		
+           		if(shape == CIRCLE)
+           		{
+           			if(begin)
+           			{
+           				w = (w>h)?h:w;
+           				h = w;
+           			}
+	           		border.graphics.clear();
+	           		border.graphics.lineStyle(2,0xffffff,1);
+	           		border.graphics.drawCircle(startx+w/2, starty+h/2, w/2);
+	           		border.graphics.drawCircle(startx+w/2, starty+h, 3);
+	           		border.graphics.drawCircle(startx, starty+h/2, 3);
+	           		border.graphics.drawCircle(startx+w/2, starty, 3);
+	           		border.graphics.drawCircle(startx+w, starty+h/2, 3);
+	           		border.alpha = 1;
+	           		
+	           		posh = new Point(startx+w/2, starty);
+		          	posrm = new Point(startx+w, starty+h/2);
+		          	posb = new Point(startx+w/2, starty+h);
+		          	poslm = new Point(startx, starty+h/2);
+           		}
+           		
+           		upwardFrame.graphics.clear();
+          		upwardFrame.graphics.beginFill(0x0000);
+				upwardFrame.graphics.lineStyle(0,0x0000,0);
+           		upwardFrame.graphics.drawRect(0, 0, this.width, starty);
+           		upwardFrame.graphics.endFill();
+           		upwardFrame.alpha = 0.5;
+           		
+           		leftFrame.graphics.clear();
+          		leftFrame.graphics.beginFill(0x0000);
+				leftFrame.graphics.lineStyle(0,0x0000,0);
+           		leftFrame.graphics.drawRect(0, starty, startx, this.height-starty);
+           		leftFrame.graphics.endFill();
+           		leftFrame.alpha = 0.5;
+           		
+           		rightFrame.graphics.clear();
+          		rightFrame.graphics.beginFill(0x0000);
+				rightFrame.graphics.lineStyle(0,0x0000,0);
+           		rightFrame.graphics.drawRect(startx+w, starty, this.width-startx-w, this.height-starty);
+           		rightFrame.graphics.endFill();
+           		rightFrame.alpha = 0.5;
+           		
+           		downFrame.graphics.clear();
+          		downFrame.graphics.beginFill(0x0000);
+				downFrame.graphics.lineStyle(0,0x0000,0);
+           		downFrame.graphics.drawRect(startx, starty+h, w, this.height-starty-h);
+           		downFrame.graphics.endFill();
+           		downFrame.alpha = 0.5;
+          	}
+          	
+          	public function up(event:MouseEvent):void
+          	{
+          		//trace("up");
+          		closelh = false;
+          		closelb = false;
+          		closerh = false;
+          		closerb = false;
+          		closeh = false;
+          		closerm = false;
+          		closeb = false;
+          		closelm = false;
+          		drag = false;
+          		
+          		if(begin)
+          		{
+          			begin = false;
+          		}
+          		backCanvas.removeEventListener(MouseEvent.MOUSE_MOVE, movesize);
+          		backCanvas.removeEventListener(MouseEvent.MOUSE_UP, up);
+          		
+          	}
+          	
+          	/* public function out(event:MouseEvent):void
+          	{
+          		trace("out");
+          		
+          	} */
+          	
+          	public function stopResize():void
+          	{
+          		resize = false;
+          	}
+          	
+          	public function enableResize():void
+          	{
+          		resize = true;
+          	}
+          	
+          	
+          	public function reset():void
+          	{
+          		
+          		//backCanvas.removeEventListener(MouseEvent.MOUSE_MOVE, movesize);
+          		
+          		pos = new Point(0,0);
+	          	poslh = new Point(0,0);
+	          	poslb = new Point(0,0);
+	          	posrh = new Point(0,0);
+	          	posrb = new Point(0,0);
+	          	posh = new Point(0,0);
+	          	posrm = new Point(0,0);
+	          	posb = new Point(0,0);
+	          	poslm = new Point(0,0);
+	          	
+	          	
+	          	closelh = false;
+	          	closelb = false;
+	          	closerh = false;
+	          	closerb = false;
+	          	closeh = false;
+	          	closerm = false;
+	          	closeb = false;
+	          	closelm = false;
+	          	
+	          	exist = false;
+	          	drag = false;
+	          	
+	          	
+	            w = 0;
+	          	h = 0;
+	          	startx = 0;
+	          	starty = 0;
+	          	prew = 0;
+	          	preh = 0;
+	          	prestartx = 0;
+	          	prestarty = 0;
+	          	xx = 0;
+	          	yy = 0;
+	          	
+	          	begin = true;
+	          	resize = true;
+          	}
+          	
+          	public function movesize(event:MouseEvent):void
+          	{
+          		
+          		//trace("move");
+	          	xx = event.stageX - pos.x;
+	          	yy = event.stageY - pos.y;
+	          	preh = h;
+	          	prew = w;
+	          	prestartx = startx;
+	          	prestarty = starty;
+	          	if(resize)
+          		{
+		          	if(closelh)
+		          	{
+		          		w -= xx;
+		           		h -= yy;
+		           		startx = startx + xx;
+		           		starty = starty + yy;
+		          		draw();
+		          		pos.x = event.stageX;
+		           		pos.y = event.stageY;
+		           		return;
+		          	}
+		          	if(closelb)
+		          	{
+		          		w -= xx;
+		           		h += yy;
+		           		startx = startx + xx;
+		          		draw();
+		          		pos.x = event.stageX;
+		           		pos.y = event.stageY;
+		           		return;
+		          	}
+		          	if(closerh)
+		          	{
+		          		w += xx;
+		           		h -= yy;
+		           		starty = starty + yy;
+		          		draw();
+		          		pos.x = event.stageX;
+		           		pos.y = event.stageY;
+		           		return;
+		          	}
+		          	if(closerb)
+		          	{
+		          		w += xx;
+		           		h += yy;
+		          		draw();
+		           		pos.x = event.stageX;
+		           		pos.y = event.stageY;
+		           		return;
+		          	}
+		          	if(closeh)
+		          	{
+		          		h -= yy;
+		           		starty = starty + yy;
+           				w = h;
+		          		draw();
+		           		pos.y = event.stageY;
+		           		return;
+		          	}
+		          	if(closerm)
+		          	{
+		          		w += xx;
+		          		h = w;
+		          		draw();
+		           		pos.x = event.stageX;
+		           		return;
+		          	}
+		          	if(closeb)
+		          	{
+		          		h += yy;
+		          		draw();
+		          		w = h;
+		          		pos.x = event.stageX;
+		           		pos.y = event.stageY;
+		           		return;
+		          	}
+		          	if(closelm)
+		          	{
+		          		w -= xx;
+		          		startx = startx + xx;
+		          		h = w;
+		          		draw();
+		           		pos.x = event.stageX;
+		           		return;
+		          	}
+		        }
+	          	if(drag)
+	          	{
+	          		
+	          		startx += xx;
+		          	starty += yy;
+		          	pos.x = event.stageX;
+		          	pos.y = event.stageY;
+		          	draw();
+	          		return;
+	          	}
+	          	if(begin)
+          		{
+          			w = event.localX - startx;
+          			h = event.localY - starty;
+          			draw();
+          			return;
+          		}
+          		
+          	}
+          	public function pickup(event:MouseEvent):void
+          	{
+          	 //trace("down");
+      			backCanvas.addEventListener(MouseEvent.MOUSE_MOVE, movesize);
+      			backCanvas.addEventListener(MouseEvent.MOUSE_UP, up);
+          		if(begin)
+          		{
+          			//trace(begin);
+          			startx = event.localX;
+          			starty = event.localY;
+          			return;
+          		}
+          		
+          		pos.x = event.stageX
+          		pos.y = event.stageY;
+          		
+          		var point:Point = new Point(event.localX, event.localY);
+          		closelh = Point.distance(point, poslh)<15;
+          		closelb = Point.distance(point, poslb)<15;
+          		closerh = Point.distance(point, posrh)<15;
+          		closerb = Point.distance(point, posrb)<15
+          		closeh = Point.distance(point, posh)<15;
+          		closerm = Point.distance(point, posrm)<15;
+          		closeb = Point.distance(point, posb)<15;
+          		closelm = Point.distance(point, poslm)<15
+          		if(!closelh&&!closelb&&!closerh&&!closerb
+          			&&!closeh&&!closerm&&!closeb&&!closelm)
+          			drag = true;
+          	}
+		]]>
+	</mx:Script>
+</mx:Canvas>
